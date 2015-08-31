@@ -8,20 +8,27 @@ from gui import *
 from ros import initTopics, ROSPublish
 from multiprocessing import Pool
 import rospy
+import os
 
 cams = ( cv2.VideoCapture(0), cv2.VideoCapture(1) )
+
+os.system('v4l2-ctl -d 0 -c focus_auto=0')
+os.system('v4l2-ctl -d 0 -c focus_absolute=20')
+os.system('v4l2-ctl -d 1 -c focus_auto=0')
+os.system('v4l2-ctl -d 1 -c focus_absolute=20')
 
 # all of this needs tidied
 sevenTwenty = (1280, 720)
 tenEighty = (1920,1080)
 resolutions = (sevenTwenty, tenEighty)
 
-setResolution(tenEighty, cams)
+setResolution(sevenTwenty, cams)
 
 
 rospy.init_node('image_capture', anonymous=True)
 initTopics()
-ROSPublish(cams) #isnt working
+
+
 
 image = None
 
@@ -74,6 +81,9 @@ class UI(wx.Frame):
 		self.panel.SetSizer(box)
 		self.panel.Layout()
 
+		ROSPublish(cams)
+
+
 		self.Show(True)
 
 	def StartCalibration():
@@ -84,7 +94,7 @@ class UI(wx.Frame):
 
 	def OnCapture(self, evt):
 		toggle = self.captureButton.GetValue()
-		
+
 		#ToggleCapture(toggle)
 
 
@@ -104,9 +114,14 @@ class UI(wx.Frame):
 
 
 if __name__ == '__main__':
-
-	app = wx.App()
-	processPool = Pool()
-	cap = UI(None, "Project", processPool)
-	#rospy.init_node('baxter_3d', anonymous=True)
-	app.MainLoop()
+	try:
+		app = wx.App()
+		processPool = Pool()
+		cap = UI(None, "Project", processPool)
+		#rospy.init_node('baxter_3d', anonymous=True)
+		app.MainLoop()
+	except KeyboardInterrupt:
+		self.Close()
+		cams[0].release()
+		cams[1].release()	
+		cv2.destroyAllWindows()

@@ -12,6 +12,14 @@ from ug_stereomatcher.msg import CamerasSync
 import time
 from capture import * # TODO decouple this from ROS and have capture and ros working together in main only
 
+__bridge = CvBridge()
+__proc = None
+__pubAcquireImages = None
+__pubImageLeft = None
+__pubImageRight = None
+__imageQueue = []
+__lastPointCloud = None
+
 
 """ depends...
 
@@ -48,7 +56,7 @@ def initTopics():
 
 	#subPointCloud = rospy.Subscriber('output_pointcloud', PointCloud2, getPointCloud)
 	#subDisparity = rospy.Subscriber('output_disparityC', DiparityImage, disp)
-	#subAcquireImage = rospy.Subscribe('acquire_images')
+	
 
 def publishImages(images):
 
@@ -114,11 +122,81 @@ def ToggleCapture(toggle):
 	global _toggle
 	_toggle = toggle
 
-def DispPublished():
+def DispPublished(): # effectively this will be used as the rate, determined by point cloud returns
 
 	time.sleep(3)
 
 	return True
 
-def disp(data):
-	print data.data
+##########
+
+
+def getPointCloud(data):
+	
+	print 'Point cloud received.'
+
+
+"""
+def __extractPointCloud(data):
+	iterData = pc2.read_points(data)
+	points = []
+	height = sqrt((data.width/float(16))*9)
+	width = 16 * ( height/float(9) )
+	height = int(height)
+	width = int(width)
+	maxDist = 0
+	z = 2
+	print "PointCloud data received."
+	for i in range(width):
+		intermediate = []
+		for j in range(height):
+			point = next(iterData)
+			if(point[z]>maxDist):
+				maxDist=point[z]
+			intermediate.append(point)
+		points.append(intermediate)
+	
+	points = np.array(points)
+	points = np.swapaxes(points, 0, 1)
+	print "New point cloud available"
+
+	newPoints = []
+	shape = (points.shape[0], points.shape[1], 3)
+	
+	for i in range(points.shape[0]):
+		for j in range(points.shape[1]):
+			zPoint = points[i][j][z]
+			if(hotNear):
+				value = (1 - (zPoint/maxDist)) * 255
+			else:
+				value = (zPoint/maxDist) * 255
+			newPoints.append((0, int(value), 0))
+	
+	image = np.array(newPoints, dtype=np.uint8)
+	image = np.reshape(image, shape)
+	print "New Depth Map Image"
+
+	cv2.imshow('depth map', image)
+
+	return image
+
+
+def constructDepthMapImage(hotNear=True, maxDist, points):
+	z = 2
+	newPoints = []
+	shape = (points.shape[0], points.shape[1], 3)
+	
+	for i in range(points.shape[0]):
+		for j in range(points.shape[1]):
+			zPoint = points[i][j][z]
+			if(hotNear):
+				value = (1 - (zPoint/maxDist)) * 255
+			else:
+				value = (zPoint/maxDist) * 255
+			newPoints.append((0, int(value), 0))
+	
+	image = np.array(newPoints, dtype=np.uint8)
+	image = np.reshape(image, shape)
+	print "New Depth Map Image"
+	return image
+"""

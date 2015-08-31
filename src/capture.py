@@ -15,8 +15,7 @@ instead of getting image.shape locally each time it is needed...
 """
 
 def getFrames(cams):
-	print "cam1: "+str(cams[0].get(3))+", "+ str(cams[0].get(4))
-	print "cam2: "+str(cams[1].get(3))+", "+ str(cams[1].get(4))
+
 	return (getFrame(cams[0]), getFrame(cams[1]) )
 
 

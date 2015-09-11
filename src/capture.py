@@ -5,7 +5,7 @@ import numpy as np
 
 __width = 0
 __height = 0
-__mode = 0
+
 
 
 """
@@ -26,10 +26,10 @@ def getFrame(cam): # TODO return ret, to test return frames and exit properly
 		return frame
 	except:
 		return None
-
+		
+"""
 def getImage(cams): # TODO make this conditional set the return instead of the image...? generally refactor this.
 	
-	mode = getCaptureMode()
 	
 	if mode == 0:
 		image = getAnaglyph(getFrames(cams))
@@ -50,18 +50,7 @@ def getImage(cams): # TODO make this conditional set the return instead of the i
 		
 
 	return image
-
-def setCaptureMode(mode):
-	global __mode
-
-	__mode = mode
-	print mode
-
-def getCaptureMode():
-	global __mode
-
-	return __mode
-
+"""
 def getRed(image):
 	
 	__height, __width = image.shape[:2]
@@ -101,6 +90,7 @@ def getAnaglyph(frames):
 
 	return image
 
+"""
 def getSideBySide(frames):
 	image = np.hstack((frames[0], frames[1]))
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -108,6 +98,7 @@ def getSideBySide(frames):
 
 def getCVDepthMap(frames):
 	print "something"
+"""
 
 def setResolution(resolution, cams):
 		global __width, __height
